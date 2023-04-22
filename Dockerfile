@@ -1,5 +1,5 @@
 # build front-end
-FROM FROM node:lts-alpine AS frontend
+FROM node:lts-alpine AS frontend
 
 RUN npm install pnpm@7 -g
 
@@ -16,7 +16,7 @@ COPY . /app
 RUN pnpm run build
 
 # build backend
-FROM FROM node:lts-alpine as backend
+FROM node:lts-alpine as backend
 
 RUN npm install pnpm@7 -g
 
