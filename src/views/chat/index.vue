@@ -115,6 +115,9 @@ async function onConversation() {
         signal: controller.signal,
         onDownloadProgress: ({ event }) => {
           const xhr = event.target
+
+          /** 这是一种称为解构赋值（Destructuring Assignment）的语法。
+              在这个例子中，const { responseText } = xhr 表示从 xhr 对象中提取 responseText 属性并将其赋值给一个名为 responseText 的新变量。这个语法可以简化代码，减少重复性工作。 */
           const { responseText } = xhr
           // Always process the final line
           const lastIndex = responseText.lastIndexOf('\n', responseText.length - 2)

@@ -20,6 +20,15 @@ export function fetchChatConfig<T = any>() {
   })
 }
 
+/**
+ * Sends a request to the chat API to process a prompt.
+ * @param params - An object containing the prompt, options, signal, and onDownloadProgress.
+ * @param params.prompt - The prompt to process.
+ * @param params.options - An optional object containing conversationId and parentMessageId.
+ * @param params.signal - An optional AbortSignal to cancel the request.
+ * @param params.onDownloadProgress - An optional function to track download progress.
+ * @returns A Promise that resolves to the response data.
+ */
 export function fetchChatAPIProcess<T = any>(
   params: {
     prompt: string
@@ -63,4 +72,30 @@ export function fetchVerify<T>(token: string) {
     url: '/verify',
     data: { token },
   })
+}
+
+/**
+ * 生成一个用于使用搜狗翻译 API 合成语音的 URL。
+ *
+ * @param text - 待合成的文本。
+ * @returns 合成音频的 URL。
+ */
+export function generateUrl(text: string): string {
+  /** text 要转换的文本
+      speed 语速 1~？（我测试到15都还可以） 越大，语速越慢
+      lan 语言类型
+      lan=en 英文
+      lan = zh-CHS 中文
+      from 没搞明白 （我猜应该是获取你是从哪里请求的，哪种方式请求的）
+      speaker 语音类型 1-6的数字
+      2 是小女孩
+      */
+  const baseUrl = 'https://fanyi.sogou.com/reventondc/synthesis'
+  const speed = '1'
+  const lang = 'en'
+  const from = 'translateweb'
+  const speaker = '3'
+  const encodedText = encodeURIComponent(text)
+  const url = `${baseUrl}?text=${encodedText}&speed=${speed}&lang=${lang}&from=${from}&speaker=${speaker}`
+  return url
 }

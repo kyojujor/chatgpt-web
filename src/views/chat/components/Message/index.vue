@@ -8,10 +8,12 @@ import { copyText } from '@/utils/format'
 import { useIconRender } from '@/hooks/useIconRender'
 import { t } from '@/locales'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
+import { generateUrl } from '@/api'
 
 interface Props {
   dateTime?: string
   text?: string
+  // true：response false:prompt
   inversion?: boolean
   error?: boolean
   loading?: boolean
@@ -24,6 +26,10 @@ interface Emit {
 
 const props = defineProps<Props>()
 
+/**
+ * 在组件实例上注册自定义事件：通过调用defineEmits方法并传入事件名称数组，将这些事件名称注册到组件实例上，使得组件内部可以通过$emit方法触发这些事件。
+为类型检查提供支持：通过在目标组件类型上使用emits关键字声明自定义事件名称数组，可以为类型检查器提供更多的信息和支持。
+ */
 const emit = defineEmits<Emit>()
 
 const { isMobile } = useBasicLayout()
@@ -31,7 +37,11 @@ const { isMobile } = useBasicLayout()
 const { iconRender } = useIconRender()
 
 const textRef = ref<HTMLElement>()
+/** 在Vue 3中，props是非响应式的数据，它们的变化不会自动触发组件重新渲染。而在模板或JavaScript代码中对props进行修改也是不被允许的。
 
+如果我们需要在组件内部对props进行操作或者监听它们的变化，就需要将它们转化为响应式的数据。ref()函数可以帮助我们将一个普通的值转换为响应式的数据，以便在组件内部进行操作和访问，同时也能够正确地将它们传递给其他组件或函数。
+
+因此，在这个例子中，我们使用ref()函数将props.inversion转换为一个响应式对象，并将其存储在一个ref变量中，以便在组件内部进行操作和访问。这样，在外部再次更新props时，组件也能够正确地反映出这些变化。 */
 const asRawText = ref(props.inversion)
 
 const messageRef = ref<HTMLElement>()
@@ -78,6 +88,26 @@ function handleRegenerate() {
   messageRef.value?.scrollIntoView()
   emit('regenerate')
 }
+
+function isEnglishOrPunctuation(str: string | undefined): boolean {
+  if (!str)
+    return false // 如果输入字符串为空，则直接返回 false
+  const pattern = /^[a-zA-Z,\.\?!]+$/
+  return pattern.test(str)
+}
+
+function playClick() {
+  playAudio()
+}
+
+function playAudio(): void {
+  if (!props.text)
+    return
+
+  const audioPath = generateUrl(props.text)
+  const audio = new Audio(audioPath)
+  audio.play()
+}
 </script>
 
 <template>
@@ -116,6 +146,7 @@ function handleRegenerate() {
           >
             <SvgIcon icon="ri:restart-line" />
           </button>
+          <!-- 由于handleSelect方法是在@select事件触发时被调用的，因此它可以直接访问该事件的参数，而不需要显式地接收该参数 -->
           <NDropdown
             :trigger="isMobile ? 'click' : 'hover'"
             :placement="!inversion ? 'right' : 'left'"
@@ -128,6 +159,14 @@ function handleRegenerate() {
           </NDropdown>
         </div>
       </div>
+      <!-- 播放按钮 仅出现在输出侧  -->
+      <button
+        v-if="!inversion && !loading"
+        class="transition text-neutral-300 hover:text-neutral-800 dark:hover:text-neutral-200"
+        @click="playClick"
+      >
+        <SvgIcon icon="material-symbols:play-circle-rounded" :width="34" :height="34" />
+      </button>
     </div>
   </div>
 </template>
