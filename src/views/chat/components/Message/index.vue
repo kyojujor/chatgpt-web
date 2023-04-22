@@ -89,12 +89,12 @@ function handleRegenerate() {
   emit('regenerate')
 }
 
-function isEnglishOrPunctuation(str: string | undefined): boolean {
-  if (!str)
-    return false // 如果输入字符串为空，则直接返回 false
-  const pattern = /^[a-zA-Z,\.\?!]+$/
-  return pattern.test(str)
-}
+// function isEnglishOrPunctuation(str: string | undefined): boolean {
+//   if (!str)
+//     return false // 如果输入字符串为空，则直接返回 false
+//   const pattern = /^[a-zA-Z,\.\?!]+$/
+//   return pattern.test(str)
+// }
 
 function playClick() {
   playAudio()
