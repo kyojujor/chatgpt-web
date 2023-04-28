@@ -8,7 +8,7 @@ import { copyText } from '@/utils/format'
 import { useIconRender } from '@/hooks/useIconRender'
 import { t } from '@/locales'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { generateUrl } from '@/api'
+import { speak } from '@/api'
 
 interface Props {
   dateTime?: string
@@ -97,16 +97,9 @@ function handleRegenerate() {
 // }
 
 function playClick() {
-  playAudio()
-}
-
-function playAudio(): void {
   if (!props.text)
     return
-
-  const audioPath = generateUrl(props.text)
-  const audio = new Audio(audioPath)
-  audio.play()
+  speak(props.text)
 }
 </script>
 

@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
-const name = ref('World')
+import { useHandleSignInCallback } from '@logto/vue'
+const { isLoading } = useHandleSignInCallback(() => {
+  // Navigate to root path when finished
+})
 </script>
 
 <template>
-  <div>Hello, {{ name }}!</div>
+  <!-- When it's working in progress -->
+  <p v-if="isLoading">
+    登录成功，正在跳转。。。
+  </p>
 </template>

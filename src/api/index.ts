@@ -80,7 +80,7 @@ export function fetchVerify<T>(token: string) {
  * @param text - 待合成的文本。
  * @returns 合成音频的 URL。
  */
-export function generateUrl(text: string): string {
+function generateUrl(text: string): string {
   /** text 要转换的文本
       speed 语速 1~？（我测试到15都还可以） 越大，语速越慢
       lan 语言类型
@@ -98,4 +98,38 @@ export function generateUrl(text: string): string {
   const encodedText = encodeURIComponent(text)
   const url = `${baseUrl}?text=${encodedText}&speed=${speed}&lang=${lang}&from=${from}&speaker=${speaker}`
   return url
+}
+
+/**
+ * Speak the given text using the browser's speech synthesis API if available.
+ * If not, generate a URL using Sogou and play the resulting audio.
+ * @param text The text to speak.
+ */
+export function speak(text: string) {
+  try {
+    // if (!speakFromBrowser(text)) {
+    //   console.log('speechSynthesis2')
+    //   const url = generateUrl(text)
+    //   const audio = new Audio(url)
+    //   audio.play()
+    // }
+    const url = generateUrl(text)
+    const audio = new Audio(url)
+    audio.play()
+  }
+  catch (error) {
+    console.error(error)
+  }
+}
+
+export function speakFromBrowser(text: string | undefined) {
+  if ('speechSynthesis' in window) {
+    // eslint-disable-next-line no-console
+    console.log('speechSynthesis')
+    const utterance = new SpeechSynthesisUtterance(text)
+    speechSynthesis.speak(utterance)
+    return true
+  }
+  console.error('Your browser does not support Web Speech API')
+  return false
 }
