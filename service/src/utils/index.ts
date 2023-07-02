@@ -1,3 +1,23 @@
+import log4js from 'log4js'
+
+log4js.configure({
+  appenders: {
+    userAccess: {
+      type: 'file',
+      filename: 'user-access.log',
+    },
+  },
+  categories: {
+    default: {
+      appenders: ['userAccess'],
+      level: 'info',
+    },
+  },
+})
+
+// 创建 logger 实例
+const logger = log4js.getLogger('userAccess')
+
 interface SendResponseOptions<T = any> {
   type: 'Success' | 'Fail'
   message?: string
@@ -19,4 +39,14 @@ export function sendResponse<T>(options: SendResponseOptions<T>) {
     data: options.data ?? null,
     status: options.type,
   })
+}
+
+/**
+ * Logs a record of a login.
+ *
+ * @param {string} userid - The user ID.
+ * @param {string} content - The content of the log.
+ */
+export function log4recordLogin(userid: string, content?: string) {
+  logger.info(`[${userid}] [${content}]`)
 }
