@@ -5,6 +5,7 @@ import { chatConfig, chatReplyProcess, currentModel } from './chatgpt'
 import { auth } from './middleware/auth'
 import { limiter } from './middleware/limiter'
 import { isNotEmptyString } from './utils/is'
+import { log4recordLogin } from './utils'
 
 const app = express()
 const router = express.Router()
@@ -25,6 +26,7 @@ router.post('/chat-process', [auth, limiter], async (req, res) => {
   try {
     const { prompt, options = {}, systemMessage, temperature, top_p } = req.body as RequestProps
     let firstChunk = true
+    logUserAccess(req, prompt)
     await chatReplyProcess({
       message: prompt,
       lastContext: options,
@@ -81,6 +83,28 @@ router.post('/verify', async (req, res) => {
     res.send({ status: 'Fail', message: error.message, data: null })
   }
 })
+
+router.get('/logtest', async (req, res) => {
+  try {
+    // const decodedData = Buffer.from(req.headers.authorization, 'base64').toString()
+    const decodedData = getAuthorization(req)
+    log4recordLogin(decodedData, 'test')
+    res.send({ status: 'Success', message: 'log successfully', data: null })
+  }
+  catch (error) {
+    console.error(`Error decoding data: ${error.message}`)
+    res.status(500).send({ status: 'Error', message: 'Failed to decode data', data: null })
+  }
+})
+
+function getAuthorization(req: any) {
+  return Buffer.from(req.headers.authorization.split(' ')[1], 'base64').toString()
+}
+
+function logUserAccess(req: any, prompt: string) {
+  const decodedData = getAuthorization(req)
+  log4recordLogin(decodedData, prompt.substring(0, 20))
+}
 
 app.use('', router)
 app.use('/api', router)
